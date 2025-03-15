@@ -174,3 +174,5 @@ cython_debug/
 .pypirc
 
 *.ico
+
+build_config.json

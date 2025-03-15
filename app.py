@@ -34,7 +34,7 @@ def decide_waiting(percentage, plugged):
 
     else:
         waiting = 180
-        
+
 
 while True and config['enabled']:
     BATTERY = psutil.sensors_battery()
