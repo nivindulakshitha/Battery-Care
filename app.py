@@ -1,15 +1,36 @@
-from Notifier import notify
+from notifier import notify
 import psutil
 import time
 import json
 
-with open("configs.json", "r") as file:
-    config = json.load(file)
+try: 
+    with open("configs.json", "r") as file:
+        config = json.load(file)
+except Exception as e:
+    print("Error reading configs.json", e)
+    config = {
+        "enabled": True,
+        "min": 20,
+        "max": 80
+    }
 
 notifications = {
     'max': False,
     'min': False,
 }
+
+waiting = 180
+
+def decide_waiting(percentage, plugged):
+    global waiting, config
+
+    radius = 10
+
+    if percentage <= config['min'] + radius and not plugged:
+        waiting = 60
+
+    elif percentage >= config['max'] - radius and plugged:
+        waiting = 60
 
 while True and config['enabled']:
     BATTERY = psutil.sensors_battery()
@@ -17,13 +38,15 @@ while True and config['enabled']:
     if BATTERY is None:
         break
 
-    percentage = BATTERY.percent
-    plugged = BATTERY.power_plugged
+    percentage = 80 # BATTERY.percent
+    plugged = True # BATTERY.power_plugged
     time_left = BATTERY.secsleft
     isUnlimitedTime = time_left == psutil.POWER_TIME_UNLIMITED
 
+    decide_waiting(percentage, plugged)
+
     if plugged:
-        notifications['max'] = False
+        notifications['max'] = notifications['max'] and True
         notifications['min'] = False
 
     # percentage is greater than or equal to 95 and plugged and notified
@@ -44,4 +67,4 @@ while True and config['enabled']:
     elif percentage <= 10 and notifications['min'] and not plugged:
         notify(percentage, "low", isUnlimitedTime, time_left)
 
-    time.sleep(60)
+    time.sleep(waiting)

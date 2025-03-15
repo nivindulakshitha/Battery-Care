@@ -13,6 +13,7 @@ def seconds_to_hms(seconds):
 
 def notify(percentage, level, isUnlimited, time_left):
     hours, minutes = seconds_to_hms(time_left)
+    notifier.message = ""
 
     match level:
         case "high":
