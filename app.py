@@ -32,14 +32,18 @@ def decide_waiting(percentage, plugged):
     elif percentage >= config['max'] - radius and plugged:
         waiting = 60
 
+    else:
+        waiting = 180
+        
+
 while True and config['enabled']:
     BATTERY = psutil.sensors_battery()
 
     if BATTERY is None:
         break
 
-    percentage = 80 # BATTERY.percent
-    plugged = True # BATTERY.power_plugged
+    percentage = BATTERY.percent
+    plugged = BATTERY.power_plugged
     time_left = BATTERY.secsleft
     isUnlimitedTime = time_left == psutil.POWER_TIME_UNLIMITED
 
